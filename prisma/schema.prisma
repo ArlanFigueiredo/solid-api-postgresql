@@ -1,0 +1,90 @@
+// Representação de tabelas no banco de dados
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(uuid())
+  name          String
+  email         String        @unique
+  password_hash String        @default("")
+  created_at    DateTime      @default(now())
+  accomodation  Accomodation?
+  Reservation   Reservation[]
+
+  @@map("users")
+}
+
+model Accomodation {
+  id                   String   @id @default(uuid())
+  name                 String   @unique
+  type                 String
+  cep                  Int
+  road                 String
+  number               Int
+  neighborhood         String
+  city                 String
+  state                String
+  number_max_hospedes  Int
+  number_room          Int
+  number_bathroom      Int
+  value_weekend        Int
+  value_daily_hospedes Int
+  created_at           DateTime @default(now())
+
+  user        User          @relation(fields: [user_id], references: [id])
+  user_id     String        @unique
+  reservation Reservation[]
+
+  @@map("accomodation")
+}
+
+model Reservation {
+  id              String   @id @default(uuid())
+  date_checkin    DateTime @default(now())
+  date_checkout   DateTime @default(now())
+  created_at      DateTime @default(now())
+  number_hospedes Int
+  number_days     Int
+  value_max       Int
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  accomodation    Accomodation @relation(fields: [accomodation_id], references: [id])
+  accomodation_id String
+
+  @@map("reservation")
+}
+
+// model CheckIn {
+//   id           String    @id @default(uuid())
+//   created_at   DateTime  @default(now())
+//   validated_at DateTime?
+
+//   user    User   @relation(fields: [user_id], references: [id])
+//   user_id String
+
+//   gym    Gym    @relation(fields: [gym_id], references: [id])
+//   gym_id String
+
+//   @@map("check_ins")
+// }
+
+// model Gym {
+//   id          String    @id @default(uuid())
+//   title       String
+//   description String?
+//   phone       String?
+//   latitude    Decimal
+//   longitude   Decimal
+//   checkIns    CheckIn[]
+
+//   @@map("gyms")
+// }
